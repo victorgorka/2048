@@ -1,5 +1,5 @@
 body {
-	background-color: #faf8ef;
+	background-color: #9fd3c7;
 }
 
 .game-container {
@@ -17,11 +17,11 @@ body {
 	gap: 15px;
 	padding: 15px;
 	border-radius: 1%;
-	background: #bbada0;
+	background: #142d4c;
 }
 
 .item {
-	background: rgb(238 228 218 / 35%);
+	background: #385170;
 	color: white;
 	text-align: center;
 	border-radius: 5%;
