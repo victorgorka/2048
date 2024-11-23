@@ -8,7 +8,6 @@ let grid = [
 
 window.onload = function () {
     gridBuilder();
-    movement();
 }
 
 function gridBuilder() {
@@ -16,6 +15,7 @@ function gridBuilder() {
     for (let i = 0; i < 16; i++) {
         const cell = document.createElement('div');
         cell.classList.add('grid-cell');
+        cell.id = `cell-${Math.floor(i / 4)}-${i % 4}`
         gridContainer.appendChild(cell);
     }
     createRandomTile();
@@ -32,5 +32,7 @@ function createRandomTile() {
         }
     });
     const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-    randomCell.textContent = Math.random() < 0.9 ? '2' : '4';
+    randomCell.textContent = Math.random() < 0.5 ? '2' : '4';
+    grid[Math.floor(randomCell.id.split('-')[1])][Math.floor(randomCell.id.split('-')[2])] = parseInt(randomCell.textContent);
+    console.log(grid);
 }
