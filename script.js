@@ -5,6 +5,15 @@ let grid = [
     [0, 0, 0, 0]
 ];
 
+const DIRECTION = {
+    Up: 'Up',
+    Down: 'Down',
+    Left: 'Left',
+    Right: 'Right'
+};
+
+const verticalDirections = [DIRECTION.Up, DIRECTION.Down];
+
 
 window.onload = function () {
     gridBuilder();
@@ -48,67 +57,35 @@ function drawGrid() {
     })
 }
 
+const mapDirections = {
+    ArrowUp: DIRECTION.Up,
+    ArrowDown: DIRECTION.Down,
+    ArrowLeft: DIRECTION.Left,
+    ArrowRight: DIRECTION.Right,
+}
+
 function handleKeyPress(event) {
-    switch (event.key) {
-        case 'ArrowUp':
-            moveUp();
-            break;
-        case 'ArrowDown':
-            moveDown();
-            break;
-        case 'ArrowLeft':
-            moveLeft();
-            break;
-        case 'ArrowRight':
-            moveRight();
-            break;
-    }
+    move(mapDirections[event.key])
 }
 
-function moveUp() {
-    const rotateGrid = rotateBoard(grid);
+function move(direction) {
+    const board = verticalDirections.includes(direction)
+        ? rotateBoard(grid)
+        : grid;
     let newGrid = [];
-    for (let col = 0; col < 4; col++) {
-        let newCol = rotateGrid[col].filter(num => num !== 0); // Filtra los ceros
-        while (newCol.length < 4) {
-            newCol.push(0); // Rellena con ceros al final
+    for (let index = 0; index < 4; index++) {
+        let newLine = board[index].filter(num => num !== 0); // Filtra los ceros
+        while (newLine.length < 4) {
+            if ([DIRECTION.Right, DIRECTION.Down].includes(direction)) {
+                newLine.unshift(0);
+            } else {
+                newLine.push(0);
+            }
         }
-        newGrid[col] = newCol;
+        newGrid[index] = newLine;
     }
-    newGrid = rotateBoard(newGrid);
-    if (!compareGrid(newGrid)) {
-        grid = newGrid;
-        createRandomTile();
-    }
-    drawGrid();
-}
-
-function moveDown() {
-    const rotateGrid = rotateBoard(grid);
-    let newGrid = [];
-    for (let col = 0; col < 4; col++) {
-        let newCol = rotateGrid[col].filter(num => num !== 0); // Filtra los ceros
-        while (newCol.length < 4) {
-            newCol.unshift(0); // Rellena con ceros al principio
-        }
-        newGrid[col] = newCol;
-    }
-    newGrid = rotateBoard(newGrid);
-    if (!compareGrid(newGrid)) {
-        grid = newGrid;
-        createRandomTile();
-    }
-    drawGrid();
-}
-
-function moveRight() {
-    let newGrid = [];
-    for (let row = 0; row < 4; row++) {
-        let newRow = grid[row].filter(num => num !== 0); // Filtra los ceros
-        while (newRow.length < 4) {
-            newRow.unshift(0); // Rellena con ceros al principio
-        }
-        newGrid[row] = newRow;
+    if (verticalDirections.includes(direction)) {
+        newGrid = rotateBoard(newGrid);
     }
     if (!compareGrid(newGrid)) {
         grid = newGrid;
@@ -117,21 +94,6 @@ function moveRight() {
     drawGrid();
 }
 
-function moveLeft() {
-    let newGrid = [];
-    for (let row = 0; row < 4; row++) {
-        let newRow = grid[row].filter(num => num !== 0); // Filtra los ceros
-        while (newRow.length < 4) {
-            newRow.push(0); // Rellena con ceros al final
-        }
-        newGrid[row] = newRow;
-    }
-    if (!compareGrid(newGrid)) {
-        grid = newGrid;
-        createRandomTile();
-    }
-    drawGrid();
-}
 
 function compareGrid(newGrid) {
     let isEqual = true
