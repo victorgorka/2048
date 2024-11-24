@@ -12,17 +12,6 @@ window.onload = function () {
 
 document.onkeydown = handleKeyPress;
 
-function updateGrid() {
-    const gridCells = document.querySelectorAll('.grid-cell');
-    console.log(gridCells);
-    gridCells.forEach(cell => {
-        const row = Math.floor(cell.id.split('-')[1]);
-        const col = Math.floor(cell.id.split('-')[2]);
-        console.log(`row: ${row} columns: ${col}`);
-        cell.textContent = grid[row][col] === 0 ? '' : grid[row][col];
-    })
-}
-
 function gridBuilder() {
     const gridContainer = document.querySelector('.grid-container');
     for (let i = 0; i < 16; i++) {
@@ -32,26 +21,34 @@ function gridBuilder() {
         gridContainer.appendChild(cell);
     }
     createRandomTile();
+    drawGrid();
 }
 
 // Create a random tile with value 2 or 4 in a random cell
 // of the grid
 function createRandomTile() {
-    const gridCells = document.querySelectorAll('.grid-cell');
     const emptyCells = [];
-    gridCells.forEach(cell => {
-        if (cell.textContent === '') {
-            emptyCells.push(cell);
-        }
+    grid.forEach((row, r) => {
+        row.forEach((cell, c) => {
+            if (cell === 0) {
+                emptyCells.push([r, c]);
+            }
+        })
     });
     const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-    randomCell.textContent = Math.random() < 0.5 ? '2' : '4';
-    grid[Math.floor(randomCell.id.split('-')[1])][Math.floor(randomCell.id.split('-')[2])] = parseInt(randomCell.textContent);
-    console.log(grid);
+    grid[randomCell[0]][randomCell[1]] = Math.random() < 0.5 ? 2 : 4;
+}
+
+function drawGrid() {
+    const gridCells = document.querySelectorAll('.grid-cell');
+    gridCells.forEach(cell => {
+        const row = Math.floor(cell.id.split('-')[1]);
+        const col = Math.floor(cell.id.split('-')[2]);
+        cell.textContent = grid[row][col] === 0 ? '' : grid[row][col];
+    })
 }
 
 function handleKeyPress(event) {
-    console.log(event);
     switch (event.key) {
         case 'ArrowUp':
             moveUp();
@@ -68,9 +65,60 @@ function handleKeyPress(event) {
     }
 }
 
+function moveUp() {
+    const rotateGrid = rotateBoard(grid);
+    let newGrid = [];
+    for (let col = 0; col < 4; col++) {
+        let newCol = rotateGrid[col].filter(num => num !== 0); // Filtra los ceros
+        while (newCol.length < 4) {
+            newCol.push(0); // Rellena con ceros al final
+        }
+        newGrid[col] = newCol;
+    }
+    newGrid = rotateBoard(newGrid);
+    if (!compareGrid(newGrid)) {
+        grid = newGrid;
+        createRandomTile();
+    }
+    drawGrid();
+}
+
+function moveDown() {
+    const rotateGrid = rotateBoard(grid);
+    let newGrid = [];
+    for (let col = 0; col < 4; col++) {
+        let newCol = rotateGrid[col].filter(num => num !== 0); // Filtra los ceros
+        while (newCol.length < 4) {
+            newCol.unshift(0); // Rellena con ceros al principio
+        }
+        newGrid[col] = newCol;
+    }
+    newGrid = rotateBoard(newGrid);
+    if (!compareGrid(newGrid)) {
+        grid = newGrid;
+        createRandomTile();
+    }
+    drawGrid();
+}
+
+function moveRight() {
+    let newGrid = [];
+    for (let row = 0; row < 4; row++) {
+        let newRow = grid[row].filter(num => num !== 0); // Filtra los ceros
+        while (newRow.length < 4) {
+            newRow.unshift(0); // Rellena con ceros al principio
+        }
+        newGrid[row] = newRow;
+    }
+    if (!compareGrid(newGrid)) {
+        grid = newGrid;
+        createRandomTile();
+    }
+    drawGrid();
+}
 
 function moveLeft() {
-    let newGrid = JSON.parse(JSON.stringify(grid));
+    let newGrid = [];
     for (let row = 0; row < 4; row++) {
         let newRow = grid[row].filter(num => num !== 0); // Filtra los ceros
         while (newRow.length < 4) {
@@ -82,8 +130,7 @@ function moveLeft() {
         grid = newGrid;
         createRandomTile();
     }
-    updateGrid();
-    console.log(grid);
+    drawGrid();
 }
 
 function compareGrid(newGrid) {
@@ -100,4 +147,18 @@ function compareGrid(newGrid) {
         }
     })
     return isEqual;
+}
+
+function rotateBoard(board) {
+    const columns = []
+    if (board.length <= 0) {
+        return [];
+    }
+
+    board[0].forEach((_, i) => {
+        const col = []
+        board.forEach(row => col.push(row[i]))
+        columns.push(col)
+    })
+    return columns;
 }
