@@ -54,6 +54,12 @@ function drawGrid() {
         const row = Math.floor(cell.id.split('-')[1]);
         const col = Math.floor(cell.id.split('-')[2]);
         cell.textContent = grid[row][col] === 0 ? '' : grid[row][col];
+        if (grid[row][col] != 0) {
+            const color = (grid[row][col] * 10) + 385170;
+            document.getElementById(cell.id).style.background = `#${color}`;
+        } else {
+            document.getElementById(cell.id).style.background = "#385170";
+        }
     })
 }
 
@@ -75,6 +81,7 @@ function move(direction) {
     let newGrid = [];
     for (let index = 0; index < 4; index++) {
         let newLine = board[index].filter(num => num !== 0); // Filtra los ceros
+        // aqui comprobar si hay merge
         while (newLine.length < 4) {
             if ([DIRECTION.Right, DIRECTION.Down].includes(direction)) {
                 newLine.unshift(0);
