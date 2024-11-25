@@ -80,12 +80,13 @@ function move(direction) {
         : grid;
     let newGrid = [];
     for (let index = 0; index < 4; index++) {
-        let newLine = board[index].filter(num => num !== 0); // Filtra los ceros
-        // aqui comprobar si hay merge
+        let newLine = board[index].filter(num => num !== 0);
+        // aqui comprobar si hay merge y hacerlo si lo hay
+        newLine = mergeTiles(direction, newLine);
         while (newLine.length < 4) {
             if ([DIRECTION.Right, DIRECTION.Down].includes(direction)) {
                 newLine.unshift(0);
-            } else {
+            } else if([DIRECTION.Left, DIRECTION.Up].includes(direction)) {
                 newLine.push(0);
             }
         }
@@ -99,6 +100,30 @@ function move(direction) {
         createRandomTile();
     }
     drawGrid();
+}
+
+function mergeTiles(direction, line) {
+    let newLine = [];
+    let prevNumber = 0;
+    let merged = false;
+
+    for (let i = 0; i < line.length; i++) {
+        if (prevNumber === 0) {
+            prevNumber = line[i];
+        } else if (prevNumber === line[i] && !merged) {
+            newLine.push(prevNumber * 2);
+            prevNumber = 0;
+            merged = true;
+        } else {
+            newLine.push(prevNumber);
+            prevNumber = line[i];
+            merged = false;
+        }
+    }
+    if (prevNumber !== 0) {
+        newLine.push(prevNumber);
+    }
+    return newLine;
 }
 
 
