@@ -5,6 +5,9 @@ let grid = [
     [0, 0, 0, 0]
 ];
 
+let score = 0;
+let maxScore = 0;
+
 const DIRECTION = {
     Up: 'Up',
     Down: 'Down',
@@ -12,7 +15,29 @@ const DIRECTION = {
     Right: 'Right'
 };
 
+const COLORS = {
+    2: '#5e4fa2',
+    4: '#3288bd',
+    8: '#66c2a5',
+    16: '#abdda4',
+    32: '#e6f598',
+    64: '#ffffbf',  
+    128: '#fee08b',
+    256: '#fdae61',
+    512: '#f46d43',
+    1024: '#d53e4f',
+    2048: '#9e0142',
+}
+
 const verticalDirections = [DIRECTION.Up, DIRECTION.Down];
+
+const mapDirections = {
+    ArrowUp: DIRECTION.Up,
+    ArrowDown: DIRECTION.Down,
+    ArrowLeft: DIRECTION.Left,
+    ArrowRight: DIRECTION.Right,
+}
+
 
 
 window.onload = function () {
@@ -53,22 +78,20 @@ function drawGrid() {
     gridCells.forEach(cell => {
         const row = Math.floor(cell.id.split('-')[1]);
         const col = Math.floor(cell.id.split('-')[2]);
-        cell.textContent = grid[row][col] === 0 ? '' : grid[row][col];
-        if (grid[row][col] != 0) {
-            const color = (grid[row][col] * 10) + 385170;
-            document.getElementById(cell.id).style.background = `#${color}`;
+        const number = grid[row][col];
+        
+        cell.textContent = number === 0 ? '' : number;
+        if (number != 0) {
+            if (number >= 16 && number <= 128) {
+                cell.style.color = 'black';
+            }
+            cell.style.background = COLORS[number];
         } else {
-            document.getElementById(cell.id).style.background = "#385170";
+            cell.style.background = "#385170";
         }
     })
 }
 
-const mapDirections = {
-    ArrowUp: DIRECTION.Up,
-    ArrowDown: DIRECTION.Down,
-    ArrowLeft: DIRECTION.Left,
-    ArrowRight: DIRECTION.Right,
-}
 
 function handleKeyPress(event) {
     move(mapDirections[event.key])
@@ -82,7 +105,7 @@ function move(direction) {
     for (let index = 0; index < 4; index++) {
         let newLine = board[index].filter(num => num !== 0);
         // aqui comprobar si hay merge y hacerlo si lo hay
-        newLine = mergeTiles(direction, newLine);
+        newLine = mergeTiles(newLine);
         while (newLine.length < 4) {
             if ([DIRECTION.Right, DIRECTION.Down].includes(direction)) {
                 newLine.unshift(0);
@@ -102,7 +125,7 @@ function move(direction) {
     drawGrid();
 }
 
-function mergeTiles(direction, line) {
+function mergeTiles(line) {
     let newLine = [];
     let prevNumber = 0;
     let merged = false;
@@ -110,6 +133,7 @@ function mergeTiles(direction, line) {
     for (let i = 0; i < line.length; i++) {
         if (prevNumber === 0) {
             prevNumber = line[i];
+            merged = false;
         } else if (prevNumber === line[i] && !merged) {
             newLine.push(prevNumber * 2);
             prevNumber = 0;
