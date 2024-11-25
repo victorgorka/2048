@@ -84,9 +84,14 @@ function drawGrid() {
         if (number != 0) {
             if (number >= 16 && number <= 128) {
                 cell.style.color = 'black';
+            } else {
+                cell.style.color = 'white';
             }
             cell.style.background = COLORS[number];
+            document.getElementById('score').innerText = score;
+            document.getElementById('max-score').innerText = maxScore;
         } else {
+            cell.style.color = 'white';
             cell.style.background = "#385170";
         }
     })
@@ -136,6 +141,10 @@ function mergeTiles(line) {
             merged = false;
         } else if (prevNumber === line[i] && !merged) {
             newLine.push(prevNumber * 2);
+            score += prevNumber * 2;
+            if (maxScore <= score) {
+                maxScore = score;
+            }
             prevNumber = 0;
             merged = true;
         } else {
@@ -179,4 +188,14 @@ function rotateBoard(board) {
         columns.push(col)
     })
     return columns;
+}
+
+function restartGame() {
+    score = 0;
+    grid.forEach(( _, i) =>{
+        grid[i] = [0,0,0,0];
+    })
+    console.log(grid)
+    createRandomTile();
+    drawGrid();
 }

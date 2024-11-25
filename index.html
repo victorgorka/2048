@@ -11,8 +11,9 @@
     <div class="game-container">
       <h1>2048</h1>
       <div class="score-container">
-        <span>Score: <span id="score">0</span></span>
-        <button id="restart-btn">Restart</button>
+        <div>Score: <span id="score">0</span></div>
+        <div>Max score: <span id="max-score">0</span></div>
+        <button id="restart-btn" onclick="restartGame();">Restart</button>
       </div>
       <div class="grid-container">
         <!-- The grid will be filled by JavaScript -->
