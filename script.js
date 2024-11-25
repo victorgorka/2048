@@ -7,6 +7,7 @@ let grid = [
 
 let score = 0;
 let maxScore = 0;
+let finish = '';
 
 const DIRECTION = {
     Up: 'Up',
@@ -21,7 +22,7 @@ const COLORS = {
     8: '#66c2a5',
     16: '#abdda4',
     32: '#e6f598',
-    64: '#ffffbf',  
+    64: '#ffffbf',
     128: '#fee08b',
     256: '#fdae61',
     512: '#f46d43',
@@ -75,11 +76,17 @@ function createRandomTile() {
 
 function drawGrid() {
     const gridCells = document.querySelectorAll('.grid-cell');
+
+    if (finish) {
+        document.querySelector('.grid-container').style.display = 'none';
+        document.getElementById('win').style.display = 'flex';
+        document.getElementById('win').innerText = finish;
+    }
     gridCells.forEach(cell => {
         const row = Math.floor(cell.id.split('-')[1]);
         const col = Math.floor(cell.id.split('-')[2]);
         const number = grid[row][col];
-        
+
         cell.textContent = number === 0 ? '' : number;
         if (number != 0) {
             if (number >= 16 && number <= 128) {
@@ -114,7 +121,7 @@ function move(direction) {
         while (newLine.length < 4) {
             if ([DIRECTION.Right, DIRECTION.Down].includes(direction)) {
                 newLine.unshift(0);
-            } else if([DIRECTION.Left, DIRECTION.Up].includes(direction)) {
+            } else if ([DIRECTION.Left, DIRECTION.Up].includes(direction)) {
                 newLine.push(0);
             }
         }
@@ -123,12 +130,21 @@ function move(direction) {
     if (verticalDirections.includes(direction)) {
         newGrid = rotateBoard(newGrid);
     }
+    checkGame();
     if (!compareGrid(newGrid)) {
         grid = newGrid;
         createRandomTile();
     }
     drawGrid();
 }
+
+function checkGame() { 
+    cells = grid.flat();
+    if (!cells.some(c => c === 0)) {
+        finish = 'YOU LOST';
+    }
+}
+
 
 function mergeTiles(line) {
     let newLine = [];
@@ -144,6 +160,9 @@ function mergeTiles(line) {
             score += prevNumber * 2;
             if (maxScore <= score) {
                 maxScore = score;
+            }
+            if (prevNumber * 2 === 2048) {
+                finish = 'YOU WIN';
             }
             prevNumber = 0;
             merged = true;
@@ -192,10 +211,13 @@ function rotateBoard(board) {
 
 function restartGame() {
     score = 0;
-    grid.forEach(( _, i) =>{
-        grid[i] = [0,0,0,0];
+    grid.forEach((_, i) => {
+        grid[i] = [0, 0, 0, 0];
     })
     console.log(grid)
     createRandomTile();
+    finish = '';
     drawGrid();
+    document.querySelector('.grid-container').style.display = 'grid';
+    document.getElementById('win').style.display = 'none';
 }
