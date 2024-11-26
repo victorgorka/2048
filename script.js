@@ -96,7 +96,7 @@ function drawGrid() {
             }
             cell.style.background = COLORS[number];
             document.getElementById('score').innerText = score;
-            document.getElementById('max-score').innerText = maxScore;
+            document.getElementById('max-score').innerText = localStorage.getItem('maxScore');
         } else {
             cell.style.color = 'white';
             cell.style.background = "#385170";
@@ -110,12 +110,16 @@ function handleKeyPress(event) {
 }
 
 function move(direction) {
+    if (![DIRECTION.Up, DIRECTION.Down, DIRECTION.Left, DIRECTION.Right].includes(direction)) {
+        return;
+    }
     const board = verticalDirections.includes(direction)
         ? rotateBoard(grid)
         : grid;
     let newGrid = [];
     for (let index = 0; index < 4; index++) {
         let newLine = board[index].filter(num => num !== 0);
+        console.log(`Original line ${index}: ${newLine}`);
         // aqui comprobar si hay merge y hacerlo si lo hay
         newLine = mergeTiles(newLine);
         while (newLine.length < 4) {
@@ -125,16 +129,19 @@ function move(direction) {
                 newLine.push(0);
             }
         }
+        console.log(`Merged line ${index}: ${newLine}`);
         newGrid[index] = newLine;
     }
+    // console.log(grid);
     if (verticalDirections.includes(direction)) {
         newGrid = rotateBoard(newGrid);
     }
-    checkGame();
     if (!compareGrid(newGrid)) {
         grid = newGrid;
         createRandomTile();
     }
+    console.log(`New grid: ${JSON.stringify(newGrid)}`);
+    checkGame();
     drawGrid();
 }
 
@@ -156,10 +163,12 @@ function mergeTiles(line) {
             prevNumber = line[i];
             merged = false;
         } else if (prevNumber === line[i] && !merged) {
+            console.log("mergeamos")
             newLine.push(prevNumber * 2);
             score += prevNumber * 2;
             if (maxScore <= score) {
                 maxScore = score;
+                localStorage.setItem('maxScore', maxScore);
             }
             if (prevNumber * 2 === 2048) {
                 finish = 'YOU WIN';
@@ -175,6 +184,7 @@ function mergeTiles(line) {
     if (prevNumber !== 0) {
         newLine.push(prevNumber);
     }
+
     return newLine;
 }
 
