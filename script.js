@@ -110,6 +110,9 @@ function handleKeyPress(event) {
 }
 
 function move(direction) {
+    if (finish) {
+        console.log(finish);
+    }
     if (![DIRECTION.Up, DIRECTION.Down, DIRECTION.Left, DIRECTION.Right].includes(direction)) {
         return;
     }
@@ -119,8 +122,6 @@ function move(direction) {
     let newGrid = [];
     for (let index = 0; index < 4; index++) {
         let newLine = board[index].filter(num => num !== 0);
-        console.log(`Original line ${index}: ${newLine}`);
-        // aqui comprobar si hay merge y hacerlo si lo hay
         newLine = mergeTiles(newLine);
         while (newLine.length < 4) {
             if ([DIRECTION.Right, DIRECTION.Down].includes(direction)) {
@@ -129,19 +130,17 @@ function move(direction) {
                 newLine.push(0);
             }
         }
-        console.log(`Merged line ${index}: ${newLine}`);
         newGrid[index] = newLine;
     }
     console.log(`New grid: ${JSON.stringify(newGrid)}`);
-    grid = newGrid;
-    validMovesLeft();
     if (verticalDirections.includes(direction)) {
         newGrid = rotateBoard(newGrid);
     }
+    validMovesLeft(newGrid);
     if (!compareGrid(newGrid)) {
+        grid = newGrid;
         createRandomTile();
     }
-    console.log(`New grid: ${JSON.stringify(newGrid)}`);
     drawGrid();
 }
 
@@ -163,7 +162,6 @@ function mergeTiles(line) {
             prevNumber = line[i];
             merged = false;
         } else if (prevNumber === line[i] && !merged) {
-            console.log("mergeamos")
             newLine.push(prevNumber * 2);
             score += prevNumber * 2;
             if (maxScore <= score) {
@@ -189,11 +187,11 @@ function mergeTiles(line) {
 }
 
 // Function to check if thereany valid moves left
-function validMovesLeft() {
+function validMovesLeft(grid) {
     let movesLeft = false;
     for (let i = 0; i < 4; i++) {
         for (let j = 0; j < 3; j++) {
-            if (grid[i][j] === grid[i][j + 1] || grid[j][i] === grid[j + 1][i]) {
+            if (grid[i][j] === grid[i][j + 1] || grid[j][i] === grid[j + 1][i] || grid[i][j] === 0 || grid[i][j + 1] === 0) {
                 movesLeft = true;
             }
         }

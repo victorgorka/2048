@@ -35,7 +35,7 @@ body {
 
 #win {
 	display: none;
-	background-color: #385170;
+	background-color: rgba(56, 81, 112, 0.8);
 	width: 455px;
 	height: 455px;
 	justify-content: center;
