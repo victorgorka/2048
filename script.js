@@ -133,13 +133,12 @@ function move(direction) {
         newGrid[index] = newLine;
     }
     console.log(`New grid: ${JSON.stringify(newGrid)}`);
-    // console.log(grid);
+    grid = newGrid;
+    validMovesLeft();
     if (verticalDirections.includes(direction)) {
         newGrid = rotateBoard(newGrid);
     }
-    checkGame(newGrid);
     if (!compareGrid(newGrid)) {
-        grid = newGrid;
         createRandomTile();
     }
     console.log(`New grid: ${JSON.stringify(newGrid)}`);
@@ -189,7 +188,22 @@ function mergeTiles(line) {
     return newLine;
 }
 
+// Function to check if thereany valid moves left
+function validMovesLeft() {
+    let movesLeft = false;
+    for (let i = 0; i < 4; i++) {
+        for (let j = 0; j < 3; j++) {
+            if (grid[i][j] === grid[i][j + 1] || grid[j][i] === grid[j + 1][i]) {
+                movesLeft = true;
+            }
+        }
+    }
+    if (!movesLeft){
+        finish = 'YOU LOST';
+    }
+}
 
+// Compare two grids to check if they are equal
 function compareGrid(newGrid) {
     let isEqual = true
     if (newGrid.length != grid.length) {
