@@ -6,8 +6,9 @@ let grid = [
 ];
 
 let score = 0;
-let maxScore = 0;
+let maxScore = localStorage.getItem('maxScore') || 0;
 let finish = '';
+let randomCell = [];
 
 const DIRECTION = {
     Up: 'Up',
@@ -39,8 +40,6 @@ const mapDirections = {
     ArrowRight: DIRECTION.Right,
 }
 
-
-
 window.onload = function () {
     gridBuilder();
 }
@@ -70,7 +69,7 @@ function createRandomTile() {
             }
         })
     });
-    const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+    randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
     grid[randomCell[0]][randomCell[1]] = Math.random() < 0.5 ? 2 : 4;
 }
 
@@ -88,7 +87,13 @@ function drawGrid() {
         const number = grid[row][col];
 
         cell.textContent = number === 0 ? '' : number;
+        if (randomCell.length === 2 && randomCell[0] === row && randomCell[1] === col) {
+            cell.style.border = '2px solid red';
+        } else {
+            cell.style.border = '';
+        }
         if (number != 0) {
+
             if (number >= 16 && number <= 128) {
                 cell.style.color = 'black';
             } else {
@@ -122,7 +127,7 @@ function move(direction) {
     let newGrid = [];
     for (let index = 0; index < 4; index++) {
         let newLine = board[index].filter(num => num !== 0);
-        newLine = mergeTiles(newLine);
+        newLine = mergeTiles(newLine, direction);
         while (newLine.length < 4) {
             if ([DIRECTION.Right, DIRECTION.Down].includes(direction)) {
                 newLine.unshift(0);
@@ -152,11 +157,14 @@ function checkGame(grid) {
 }
 
 
-function mergeTiles(line) {
+function mergeTiles(line, direction) {
     let newLine = [];
     let prevNumber = 0;
     let merged = false;
 
+    if ([DIRECTION.Right, DIRECTION.Down].includes(direction)) {
+        line = line.reverse();
+    }
     for (let i = 0; i < line.length; i++) {
         if (prevNumber === 0) {
             prevNumber = line[i];
@@ -183,7 +191,9 @@ function mergeTiles(line) {
         newLine.push(prevNumber);
     }
 
-    return newLine;
+    return [DIRECTION.Right, DIRECTION.Down].includes(direction)
+        ? newLine.reverse()
+        : newLine;
 }
 
 // Function to check if thereany valid moves left
