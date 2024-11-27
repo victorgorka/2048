@@ -132,20 +132,21 @@ function move(direction) {
         console.log(`Merged line ${index}: ${newLine}`);
         newGrid[index] = newLine;
     }
+    console.log(`New grid: ${JSON.stringify(newGrid)}`);
     // console.log(grid);
     if (verticalDirections.includes(direction)) {
         newGrid = rotateBoard(newGrid);
     }
+    checkGame(newGrid);
     if (!compareGrid(newGrid)) {
         grid = newGrid;
         createRandomTile();
     }
     console.log(`New grid: ${JSON.stringify(newGrid)}`);
-    checkGame();
     drawGrid();
 }
 
-function checkGame() { 
+function checkGame(grid) { 
     cells = grid.flat();
     if (!cells.some(c => c === 0)) {
         finish = 'YOU LOST';
